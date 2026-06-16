@@ -16,26 +16,38 @@
 
     <form action="/update/{{ patient.id }}" method="POST">
 
-        <input type="text" name="full_name" class="form-control mb-3"
-        value="{{ patient.full_name }}" required>
+        <form action="/update/{{ patient.id }}" method="POST"><label class="form-label">Full Name</label>
+<input type="text" name="full_name" class="form-control mb-3"
+value="{{ patient.full_name }}" required>
 
-        <input type="date" name="dob" class="form-control mb-3"
-        value="{{ patient.dob }}" required>
+<label class="form-label">Patient Date of Birth (DOB)</label>
+<input class="form-control mt-2" type="date" name="dob" required>
+<small class="text-muted">Please select patient birth date</small>
 
-        <input type="email" name="email" class="form-control mb-3"
-        value="{{ patient.email }}" required>
+<label class="form-label">Email Address</label>
+<input type="email" name="email" class="form-control mb-3"
+value="{{ patient.email }}" required>
 
-        <input type="number" step="0.01" name="glucose"
-        class="form-control mb-3"
-        value="{{ patient.glucose }}" required>
+<label class="form-label">Glucose Level</label>
+<input type="number" step="0.01" name="glucose"
+class="form-control mb-3"
+value="{{ patient.glucose }}" required>
 
-        <input type="number" step="0.01" name="haemoglobin"
-        class="form-control mb-3"
-        value="{{ patient.haemoglobin }}" required>
+<label class="form-label">Haemoglobin Level</label>
+<input type="number" step="0.01" name="haemoglobin"
+class="form-control mb-3"
+value="{{ patient.haemoglobin }}" required>
 
-        <input type="number" step="0.01" name="cholesterol"
-        class="form-control mb-3"
-        value="{{ patient.cholesterol }}" required>
+<label class="form-label">Cholesterol Level</label>
+<input type="number" step="0.01" name="cholesterol"
+class="form-control mb-3"
+value="{{ patient.cholesterol }}" required>
+
+<button class="btn btn-primary">
+    Update Patient
+</button>
+
+</form>
 
         <button class="btn btn-primary">
             Update Patient
