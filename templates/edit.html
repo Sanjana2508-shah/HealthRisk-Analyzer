@@ -20,9 +20,9 @@
 <input type="text" name="full_name" class="form-control mb-3"
 value="{{ patient.full_name }}" required>
 
-<label class="form-label">Date of Birth (DOB)</label>
-<input type="date" name="dob" class="form-control mb-3"
-value="{{ patient.dob }}" required>
+<label class="form-label">Patient Date of Birth (DOB)</label>
+<input class="form-control mt-2" type="date" name="dob" required>
+<small class="text-muted">Please select patient birth date</small>
 
 <label class="form-label">Email Address</label>
 <input type="email" name="email" class="form-control mb-3"
