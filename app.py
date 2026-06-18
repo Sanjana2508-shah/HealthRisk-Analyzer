@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -41,14 +40,21 @@ def predict(glucose, haemoglobin, cholesterol):
     except Exception as e:
         return f"AI Service Busy: {str(e)}"
 
-@app.route('/')
+@app.route("/")
+def home():
+    return render_template("home.html")
+@app.route("/add-patient")
+def add_patient_page():
+    return render_template("add_patient.html")
 
-def index():
+
+@app.route("/patients")
+def patients_page():
 
     patients = Patient.query.all()
 
     return render_template(
-        'index.html',
+        "patients.html",
         patients=patients
     )
 
@@ -79,7 +85,7 @@ def add():
     db.session.add(patient)
     db.session.commit()
 
-    return redirect('/')
+    return redirect('/patients')
 
 @app.route('/delete/<int:id>')
 
@@ -91,7 +97,7 @@ def delete(id):
 
     db.session.commit()
 
-    return redirect('/')
+    return redirect('/patients')
 @app.route('/edit/<int:id>')
 
 def edit(id):
@@ -134,7 +140,7 @@ def update(id):
 
     db.session.commit()
 
-    return redirect('/')
+    return redirect('/patients')
 
 
 with app.app_context():
