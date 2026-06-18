@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from google import genai
 
 app = Flask(__name__)
-client = genai.Client(api_key="key")
+app.secret_key = "healthrisk123"
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///patients.db'
 db = SQLAlchemy(app)
@@ -43,6 +44,7 @@ def predict(glucose, haemoglobin, cholesterol):
 @app.route("/")
 def home():
     return render_template("home.html")
+
 @app.route("/add-patient")
 def add_patient_page():
     return render_template("add_patient.html")
@@ -85,7 +87,9 @@ def add():
     db.session.add(patient)
     db.session.commit()
 
-    return redirect('/patients')
+    flash("✅ New patient added successfully!")
+
+    return redirect('/add-patient')
 
 @app.route('/delete/<int:id>')
 
