@@ -1,4 +1,6 @@
 Flask
 Flask-SQLAlchemy
+groq
+python-dotenv
 google-genai
 gunicorn
