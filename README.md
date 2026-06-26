@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 🏥 HealthRisk Analyzer v2.0
 
 AI-powered Healthcare Staff Portal built with **Flask**, **SQLite**, and **Groq AI (Llama 3.3 70B)**.
@@ -101,6 +102,8 @@ http://127.0.0.1:5000
 B.Tech Information Technology (2025)
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> 627989d956bc58cb5888bb7aa878bb64e9dbd619
 AI Health Prediction Application
 
 Overview
@@ -225,4 +228,7 @@ Results Display
 Sanjana Kumari Shah
 B.Tech Information Technology (2025)
 >>>>>>> 3833dddf645d33e8dd5de9b2cadb4bb67b2a7db4
+<<<<<<< HEAD
+>>>>>>> 627989d956bc58cb5888bb7aa878bb64e9dbd619
+=======
 >>>>>>> 627989d956bc58cb5888bb7aa878bb64e9dbd619
