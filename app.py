@@ -10,9 +10,9 @@ import os
 app = Flask(__name__)
 app.secret_key = "healthrisk123"
 
-client = Groq(api_key="GROQ_API_KEY")
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///patients.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///patients_v2.db'
 db = SQLAlchemy(app)
 
 
