@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}All Patients — HealthRisk Analyzer{% endblock %}
+{% block page_title %}All Patients{% endblock %}
+
+{% block content %}
+
+<!-- SEARCH & FILTER BAR -->
+<div class="card" style="margin-bottom:24px;">
+    <div class="card-body" style="padding:18px 24px;">
+        <form method="GET" action="/patients">
+            <div class="search-bar">
+                <div class="search-input-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" placeholder="Search by patient name…" value="{{ search }}">
+                </div>
+                <select name="condition" style="padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; background:#FAFBFC; outline:none; min-width:180px;">
+                    <option value="">All Conditions</option>
+                    <option value="Healthy" {% if filter_condition == 'Healthy' %}selected{% endif %}>Healthy</option>
+                    <option value="Diabetic" {% if filter_condition == 'Diabetic' %}selected{% endif %}>Diabetic Risk</option>
+                    <option value="Hypertension" {% if filter_condition == 'Hypertension' %}selected{% endif %}>Hypertension</option>
+                    <option value="Obese" {% if filter_condition == 'Obese' %}selected{% endif %}>Obese</option>
+                    <option value="Overweight" {% if filter_condition == 'Overweight' %}selected{% endif %}>Overweight</option>
+                    <option value="Cholesterol" {% if filter_condition == 'Cholesterol' %}selected{% endif %}>High Cholesterol</option>
+                    <option value="Oxygen" {% if filter_condition == 'Oxygen' %}selected{% endif %}>Low Oxygen</option>
+                </select>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+                {% if search or filter_condition %}
+                    <a href="/patients" class="btn btn-outline"><i class="fas fa-times"></i> Clear</a>
+                {% endif %}
+                <a href="/add-patient" class="btn btn-success" style="margin-left:auto;"><i class="fas fa-user-plus"></i> Add Patient</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- PATIENTS TABLE -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title"><i class="fas fa-table-list"></i> Patient Records
+            <span style="background:var(--primary-light); color:var(--primary); font-size:12px; padding:3px 10px; border-radius:20px; font-weight:700;">{{ patients|length }}</span>
+        </div>
+        <span style="font-size:13px; color:var(--neutral);">AI remarks shown for each patient</span>
+    </div>
+
+    {% if patients %}
+    <div class="card-body" style="padding:0;">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>DOB / Age</th>
+                        <th>BMI</th>
+                        <th>BMR</th>
+                        <th>BP</th>
+                        <th>SpO₂</th>
+                        <th>Glucose</th>
+                        <th>Hgb</th>
+                        <th>Chol</th>
+                        <th>Condition</th>
+                        <th>AI Remark</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in patients %}
+                    <tr>
+                        <td style="color:var(--neutral); font-size:12px; font-weight:600;">#{{ p.id }}</td>
+
+                        <td>
+                            <div style="font-weight:700; white-space:nowrap;">{{ p.full_name }}</div>
+                            <div style="font-size:11px; color:var(--neutral);">{{ p.email }}</div>
+                            {% if p.phone %}<div style="font-size:11px; color:var(--neutral);">{{ p.phone }}</div>{% endif %}
+                        </td>
+
+                        <td style="white-space:nowrap;">
+                            <div>{{ p.dob }}</div>
+                            <div style="font-size:11px; color:var(--neutral);">{{ p.gender or '' }}</div>
+                        </td>
+
+                        <td>
+                            {% if p.bmi %}
+                                <div style="font-weight:700; font-size:15px;">{{ p.bmi }}</div>
+                                {% if p.bmi < 18.5 %}
+                                    <div style="font-size:10px; color:#D97706; font-weight:600;">Underweight</div>
+                                {% elif p.bmi < 25 %}
+                                    <div style="font-size:10px; color:#059669; font-weight:600;">Normal</div>
+                                {% elif p.bmi < 30 %}
+                                    <div style="font-size:10px; color:#D97706; font-weight:600;">Overweight</div>
+                                {% else %}
+                                    <div style="font-size:10px; color:#DC2626; font-weight:600;">Obese</div>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+
+                        <td style="white-space:nowrap;">
+                            {% if p.bmr %}
+                                <span style="font-weight:600;">{{ p.bmr }}</span>
+                                <span style="font-size:10px; color:var(--neutral);"> kcal</span>
+                            {% else %}—{% endif %}
+                        </td>
+
+                        <td style="white-space:nowrap;">
+                            {% if p.bp_systolic %}
+                                <span style="font-weight:700;">{{ p.bp_systolic }}/{{ p.bp_diastolic }}</span>
+                                <span style="font-size:10px; color:var(--neutral);"> mmHg</span>
+                                {% if p.bp_systolic >= 140 %}
+                                    <div style="font-size:10px; color:#DC2626; font-weight:600;">High</div>
+                                {% elif p.bp_systolic >= 120 %}
+                                    <div style="font-size:10px; color:#D97706; font-weight:600;">Elevated</div>
+                                {% else %}
+                                    <div style="font-size:10px; color:#059669; font-weight:600;">Normal</div>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+
+                        <td>
+                            {% if p.oxygen_level %}
+                                <span style="font-weight:700;">{{ p.oxygen_level }}%</span>
+                                {% if p.oxygen_level < 95 %}
+                                    <div style="font-size:10px; color:#DC2626; font-weight:600;">Low</div>
+                                {% else %}
+                                    <div style="font-size:10px; color:#059669; font-weight:600;">Normal</div>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+
+                        <td>
+                            <span style="font-weight:600;">{{ p.glucose }}</span>
+                            <span style="font-size:10px; color:var(--neutral);"> mg/dL</span>
+                            {% if p.glucose >= 126 %}
+                                <div style="font-size:10px; color:#DC2626; font-weight:600;">High</div>
+                            {% elif p.glucose >= 100 %}
+                                <div style="font-size:10px; color:#D97706; font-weight:600;">Pre-DM</div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span style="font-weight:600;">{{ p.haemoglobin }}</span>
+                            <span style="font-size:10px; color:var(--neutral);"> g/dL</span>
+                        </td>
+
+                        <td>
+                            <span style="font-weight:600;">{{ p.cholesterol }}</span>
+                            <span style="font-size:10px; color:var(--neutral);"> mg/dL</span>
+                        </td>
+
+                        <td>
+                            {% set cond = p.health_condition or 'Unknown' %}
+                            {% if cond == 'Healthy' %}
+                                <span class="badge badge-healthy"><i class="fas fa-check"></i> {{ cond }}</span>
+                            {% elif 'Hypertension' in cond or 'Diabetic' in cond or 'Obese' in cond or 'Oxygen' in cond %}
+                                <span class="badge badge-danger" title="{{ cond }}">⚠ {{ cond[:18] }}{% if cond|length > 18 %}…{% endif %}</span>
+                            {% else %}
+                                <span class="badge badge-warning" title="{{ cond }}">{{ cond[:18] }}{% if cond|length > 18 %}…{% endif %}</span>
+                            {% endif %}
+                        </td>
+
+                        <td style="max-width:220px;">
+                            <div class="remark-preview" style="font-size:12px; color:var(--text-light); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; cursor:pointer;"
+                                 onclick="toggleRemark(this)" title="Click to expand">
+                                {{ p.remarks or 'No remark available' }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div style="display:flex; gap:5px;">
+                                <a href="/patient/{{ p.id }}" class="btn btn-outline btn-sm" title="View Details"><i class="fas fa-eye"></i></a>
+                                <a href="/edit/{{ p.id }}" class="btn btn-outline btn-sm" title="Edit"><i class="fas fa-pen"></i></a>
+                                <a href="/delete/{{ p.id }}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Delete {{ p.full_name }}? This cannot be undone.')"
+                                   title="Delete"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-user-slash"></i>
+        <h3>No patients found</h3>
+        <p>{% if search or filter_condition %}Try adjusting your search filters.{% else %}Start by adding your first patient.{% endif %}</p>
+        <a href="/add-patient" class="btn btn-primary" style="margin-top:16px;"><i class="fas fa-plus"></i> Add Patient</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleRemark(el) {
+        if (el.style.webkitLineClamp === 'unset') {
+            el.style.webkitLineClamp = '2';
+            el.style.overflow = 'hidden';
+        } else {
+            el.style.webkitLineClamp = 'unset';
+            el.style.overflow = 'visible';
+        }
+    }
+</script>
+{% endblock %}

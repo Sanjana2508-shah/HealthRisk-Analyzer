@@ -1,3 +1,5 @@
-Flask
-Flask-SQLAlchemy
-google-genai
+flask
+flask-sqlalchemy
+groq
+python-dotenv
+gunicorn

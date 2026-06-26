@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.full_name }} — HealthRisk Analyzer{% endblock %}
+{% block page_title %}Patient Detail{% endblock %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="card" style="margin-bottom:24px;">
+    <div class="card-body" style="padding:24px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+        <div style="width:60px; height:60px; border-radius:16px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0;">
+            {% if patient.gender == 'Female' %}👩{% else %}👨{% endif %}
+        </div>
+        <div style="flex:1;">
+            <h2 style="font-size:22px; font-weight:800; color:var(--text);">{{ patient.full_name }}</h2>
+            <div style="display:flex; gap:16px; margin-top:6px; flex-wrap:wrap;">
+                <span style="font-size:13px; color:var(--neutral);"><i class="fas fa-envelope" style="margin-right:5px;"></i>{{ patient.email }}</span>
+                {% if patient.phone %}<span style="font-size:13px; color:var(--neutral);"><i class="fas fa-phone" style="margin-right:5px;"></i>{{ patient.phone }}</span>{% endif %}
+                <span style="font-size:13px; color:var(--neutral);"><i class="fas fa-calendar" style="margin-right:5px;"></i>DOB: {{ patient.dob }}</span>
+                <span style="font-size:13px; color:var(--neutral);">{{ patient.gender or '' }}</span>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            {% set cond = patient.health_condition or 'Unknown' %}
+            {% if cond == 'Healthy' %}
+                <span class="badge badge-healthy" style="padding:8px 16px; font-size:13px;"><i class="fas fa-check-circle"></i> {{ cond }}</span>
+            {% elif 'Hypertension' in cond or 'Diabetic' in cond or 'Obese' in cond %}
+                <span class="badge badge-danger" style="padding:8px 16px; font-size:13px;">⚠ {{ cond }}</span>
+            {% else %}
+                <span class="badge badge-warning" style="padding:8px 16px; font-size:13px;">{{ cond }}</span>
+            {% endif %}
+            <a href="/edit/{{ patient.id }}" class="btn btn-primary btn-sm"><i class="fas fa-pen"></i> Edit</a>
+            <a href="/patients" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+
+    <!-- PHYSICAL MEASUREMENTS -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fas fa-ruler-combined"></i> Physical Measurements</div>
+        </div>
+        <div class="card-body">
+            <div class="vitals-grid">
+                <div class="vital-item">
+                    <div class="vital-label">Weight</div>
+                    <div class="vital-value">{{ patient.weight or '—' }}</div>
+                    <div class="vital-unit">kg</div>
+                </div>
+                <div class="vital-item">
+                    <div class="vital-label">Height</div>
+                    <div class="vital-value">{{ patient.height or '—' }}</div>
+                    <div class="vital-unit">cm</div>
+                </div>
+                <div class="vital-item" style="background:{% if patient.bmi and patient.bmi < 18.5 %}#FFF7ED{% elif patient.bmi and patient.bmi < 25 %}#ECFDF5{% elif patient.bmi and patient.bmi < 30 %}#FFF7ED{% elif patient.bmi %}#FEF2F2{% else %}#F8FAFC{% endif %};">
+                    <div class="vital-label">BMI</div>
+                    <div class="vital-value" style="color:{% if patient.bmi and patient.bmi < 18.5 %}#D97706{% elif patient.bmi and patient.bmi < 25 %}#059669{% elif patient.bmi and patient.bmi < 30 %}#D97706{% elif patient.bmi %}#DC2626{% else %}var(--text){% endif %};">{{ patient.bmi or '—' }}</div>
+                    <div class="vital-unit">
+                        {% if patient.bmi %}
+                            {% if patient.bmi < 18.5 %}Underweight
+                            {% elif patient.bmi < 25 %}Normal Weight
+                            {% elif patient.bmi < 30 %}Overweight
+                            {% else %}Obese{% endif %}
+                        {% else %}kg/m²{% endif %}
+                    </div>
+                </div>
+                <div class="vital-item" style="grid-column: span 3;">
+                    <div class="vital-label">BMR (Basal Metabolic Rate)</div>
+                    <div class="vital-value">{{ patient.bmr or '—' }}</div>
+                    <div class="vital-unit">kcal/day — Minimum calories needed at rest</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VITAL SIGNS -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fas fa-heart-pulse"></i> Vital Signs</div>
+        </div>
+        <div class="card-body">
+            <div class="vitals-grid">
+                <div class="vital-item" style="grid-column:span 2; background:{% if patient.bp_systolic and patient.bp_systolic >= 140 %}#FEF2F2{% elif patient.bp_systolic and patient.bp_systolic >= 120 %}#FFF7ED{% else %}#ECFDF5{% endif %};">
+                    <div class="vital-label">Blood Pressure</div>
+                    <div class="vital-value" style="font-size:24px;">
+                        {{ patient.bp_systolic or '—' }}/{{ patient.bp_diastolic or '—' }}
+                    </div>
+                    <div class="vital-unit">
+                        mmHg &nbsp;·&nbsp;
+                        {% if patient.bp_systolic %}
+                            {% if patient.bp_systolic >= 140 %}<span style="color:#DC2626; font-weight:600;">Hypertension Stage 2</span>
+                            {% elif patient.bp_systolic >= 130 %}<span style="color:#DC2626; font-weight:600;">Hypertension Stage 1</span>
+                            {% elif patient.bp_systolic >= 120 %}<span style="color:#D97706; font-weight:600;">Elevated</span>
+                            {% else %}<span style="color:#059669; font-weight:600;">Normal</span>{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="vital-item" style="background:{% if patient.oxygen_level and patient.oxygen_level < 90 %}#FEF2F2{% elif patient.oxygen_level and patient.oxygen_level < 95 %}#FFF7ED{% else %}#ECFDF5{% endif %};">
+                    <div class="vital-label">SpO₂ (Oxygen)</div>
+                    <div class="vital-value">{{ patient.oxygen_level or '—' }}%</div>
+                    <div class="vital-unit">
+                        {% if patient.oxygen_level %}
+                            {% if patient.oxygen_level < 90 %}<span style="color:#DC2626; font-weight:600;">Critical Low</span>
+                            {% elif patient.oxygen_level < 95 %}<span style="color:#D97706; font-weight:600;">Low</span>
+                            {% else %}<span style="color:#059669; font-weight:600;">Normal</span>{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAB VALUES -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fas fa-flask"></i> Laboratory Values</div>
+        </div>
+        <div class="card-body">
+            <div class="vitals-grid">
+                <div class="vital-item" style="background:{% if patient.glucose >= 126 %}#FEF2F2{% elif patient.glucose >= 100 %}#FFF7ED{% else %}#ECFDF5{% endif %};">
+                    <div class="vital-label">Glucose (Fasting)</div>
+                    <div class="vital-value">{{ patient.glucose }}</div>
+                    <div class="vital-unit">mg/dL &nbsp;·&nbsp;
+                        {% if patient.glucose >= 126 %}<span style="color:#DC2626; font-weight:600;">Diabetic Range</span>
+                        {% elif patient.glucose >= 100 %}<span style="color:#D97706; font-weight:600;">Pre-Diabetic</span>
+                        {% else %}<span style="color:#059669; font-weight:600;">Normal</span>{% endif %}
+                    </div>
+                </div>
+                <div class="vital-item">
+                    <div class="vital-label">Haemoglobin</div>
+                    <div class="vital-value">{{ patient.haemoglobin }}</div>
+                    <div class="vital-unit">g/dL</div>
+                </div>
+                <div class="vital-item" style="background:{% if patient.cholesterol >= 240 %}#FEF2F2{% elif patient.cholesterol >= 200 %}#FFF7ED{% else %}#ECFDF5{% endif %};">
+                    <div class="vital-label">Cholesterol</div>
+                    <div class="vital-value">{{ patient.cholesterol }}</div>
+                    <div class="vital-unit">mg/dL &nbsp;·&nbsp;
+                        {% if patient.cholesterol >= 240 %}<span style="color:#DC2626; font-weight:600;">High</span>
+                        {% elif patient.cholesterol >= 200 %}<span style="color:#D97706; font-weight:600;">Borderline</span>
+                        {% else %}<span style="color:#059669; font-weight:600;">Desirable</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI REMARK -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><i class="fas fa-robot"></i> AI Health Remark</div>
+            <span style="font-size:11px; background:#EFF6FF; color:var(--primary); padding:3px 10px; border-radius:20px; font-weight:600;">Powered by Gemini AI</span>
+        </div>
+        <div class="card-body">
+            <div class="remark-box" style="margin-top:0;">
+                <h4><i class="fas fa-stethoscope"></i> Clinical Assessment</h4>
+                <p style="line-height:1.8;">{{ patient.remarks or 'No AI remark generated yet. Edit the patient to regenerate.' }}</p>
+            </div>
+            {% if patient.created_at %}
+            <div style="margin-top:14px; font-size:12px; color:var(--neutral);">
+                <i class="fas fa-clock"></i> Record created: {{ patient.created_at.strftime('%d %b %Y, %I:%M %p') }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<!-- DELETE ZONE -->
+<div class="card" style="margin-top:24px; border-color:#FECACA;">
+    <div class="card-body" style="padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div>
+            <div style="font-size:14px; font-weight:700; color:#DC2626;"><i class="fas fa-triangle-exclamation"></i> Danger Zone</div>
+            <div style="font-size:13px; color:var(--text-light);">Permanently delete this patient's record. This action cannot be undone.</div>
+        </div>
+        <a href="/delete/{{ patient.id }}"
+           class="btn btn-danger"
+           onclick="return confirm('Are you sure you want to delete {{ patient.full_name }}? This cannot be undone.')">
+            <i class="fas fa-trash"></i> Delete Patient
+        </a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Add Patient — HealthRisk Analyzer{% endblock %}
+{% block page_title %}Add New Patient{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title"><i class="fas fa-user-plus"></i> Patient Registration Form</div>
+        <span style="font-size:13px; color:var(--neutral);"><span style="color:var(--danger);">*</span> Required fields</span>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="/add" id="patientForm">
+
+            <!-- SECTION 1: Personal Info -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-id-card"></i> Personal Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Full Name <span class="req">*</span></label>
+                        <input type="text" name="full_name" placeholder="e.g. Priya Sharma" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth <span class="req">*</span></label>
+                        <input type="date" name="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender <span class="req">*</span></label>
+                        <select name="gender" required>
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address <span class="req">*</span></label>
+                        <input type="email" name="email" placeholder="patient@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" name="phone" placeholder="+91 9876543210">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Physical Measurements -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-ruler-vertical"></i> Physical Measurements</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Weight <span class="req">*</span></label>
+                        <input type="number" name="weight" step="0.1" min="1" max="300" placeholder="e.g. 65" required id="weight-input">
+                        <div class="form-hint">In kilograms (kg)</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Height <span class="req">*</span></label>
+                        <input type="number" name="height" step="0.1" min="50" max="250" placeholder="e.g. 165" required id="height-input">
+                        <div class="form-hint">In centimeters (cm)</div>
+                    </div>
+                    <div class="form-group">
+                        <label>BMI (Auto-calculated)</label>
+                        <input type="text" id="bmi-display" placeholder="Enter weight & height" readonly
+                               style="background:#F0F4F8; color:var(--primary); font-weight:700;">
+                        <div class="form-hint" id="bmi-category">Will calculate automatically</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Vitals -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-heart-pulse"></i> Vital Signs</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Blood Pressure — Systolic <span class="req">*</span></label>
+                        <input type="number" name="bp_systolic" min="60" max="250" placeholder="e.g. 120" required>
+                        <div class="form-hint">Upper number (mmHg). Normal: 90–120</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Blood Pressure — Diastolic <span class="req">*</span></label>
+                        <input type="number" name="bp_diastolic" min="40" max="150" placeholder="e.g. 80" required>
+                        <div class="form-hint">Lower number (mmHg). Normal: 60–80</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Oxygen Level (SpO₂) <span class="req">*</span></label>
+                        <input type="number" name="oxygen_level" step="0.1" min="50" max="100" placeholder="e.g. 98" required>
+                        <div class="form-hint">In %. Normal: 95–100%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: Lab Values -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="fas fa-flask"></i> Laboratory Values</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Fasting Glucose <span class="req">*</span></label>
+                        <input type="number" name="glucose" step="0.1" min="0" max="600" placeholder="e.g. 95" required>
+                        <div class="form-hint">In mg/dL. Normal: 70–99</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Haemoglobin <span class="req">*</span></label>
+                        <input type="number" name="haemoglobin" step="0.1" min="1" max="25" placeholder="e.g. 13.5" required>
+                        <div class="form-hint">In g/dL. Normal: 12–17</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Cholesterol <span class="req">*</span></label>
+                        <input type="number" name="cholesterol" step="0.1" min="0" max="600" placeholder="e.g. 180" required>
+                        <div class="form-hint">In mg/dL. Desirable: &lt;200</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBMIT -->
+            <div style="display:flex; gap:14px; align-items:center; padding-top:8px; border-top:1px solid var(--border);">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-robot"></i> Submit & Get AI Remark
+                </button>
+                <a href="/patients" class="btn btn-outline"><i class="fas fa-users"></i> View All Patients</a>
+                <span id="loading-msg" style="display:none; font-size:13px; color:var(--neutral);">
+                    <i class="fas fa-spinner fa-spin"></i> Generating AI remark… please wait
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // BMI live calculator
+    const weightInput = document.getElementById('weight-input');
+    const heightInput = document.getElementById('height-input');
+    const bmiDisplay  = document.getElementById('bmi-display');
+    const bmiCategory = document.getElementById('bmi-category');
+
+    function calcBMI() {
+        const w = parseFloat(weightInput.value);
+        const h = parseFloat(heightInput.value) / 100;
+        if (w > 0 && h > 0) {
+            const bmi = (w / (h * h)).toFixed(1);
+            bmiDisplay.value = bmi;
+            let cat = '', color = '';
+            if (bmi < 18.5)       { cat = '⚠ Underweight'; color = '#D97706'; }
+            else if (bmi < 25)    { cat = '✅ Normal Weight'; color = '#059669'; }
+            else if (bmi < 30)    { cat = '⚠ Overweight';   color = '#D97706'; }
+            else                  { cat = '🔴 Obese';        color = '#DC2626'; }
+            bmiCategory.textContent = cat;
+            bmiCategory.style.color = color;
+            bmiCategory.style.fontWeight = '600';
+        } else {
+            bmiDisplay.value = '';
+            bmiCategory.textContent = 'Will calculate automatically';
+            bmiCategory.style.color = '';
+        }
+    }
+
+    weightInput.addEventListener('input', calcBMI);
+    heightInput.addEventListener('input', calcBMI);
+
+    // Loading state on submit
+    document.getElementById('patientForm').addEventListener('submit', function() {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
+        document.getElementById('loading-msg').style.display = 'inline-flex';
+    });
+
+    // Scroll to remark on load
+    const remarkEl = document.getElementById('flash-remark');
+    if (remarkEl) {
+        remarkEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+</script>
+{% endblock %}
